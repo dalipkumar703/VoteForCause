@@ -13,6 +13,7 @@
     "express": "^4.16.1",
     "mongoose": "^4.11.14",
     "nodemon": "^1.12.1",
+    "request": "^2.83.0",
     "require": "^2.4.20"
   }
 }
