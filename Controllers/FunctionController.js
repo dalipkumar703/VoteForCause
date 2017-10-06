@@ -1,8 +1,10 @@
 var AnswerOfRangeType=require('../Models/answer-of-type-1');
 var AnswerOfCheckType=require('../Models/answer-of-type-2');
 var UserVotes=require('../Models/user-votes');
+//when answer of question range
 exports.answerTypeRangeUpdate=function(req,answer,data){
-     var set={};
+     var set={};   //new json object create
+   //check which range value user choosen and update json object
    if(answer.vote=="answer_one")
    {
      console.log("answer_one:",data[0].answer_two);
@@ -75,6 +77,7 @@ exports.answerTypeRangeUpdate=function(req,answer,data){
      };
    }
  console.log("set:",set);
+ // update user vote on answerofrangetype model
   AnswerOfRangeType.update({
     $and :[
       {form_id: req.body.form_id},
@@ -87,6 +90,7 @@ exports.answerTypeRangeUpdate=function(req,answer,data){
     if(!err&&data!=null)
     {
       console.log("success",data);
+        //save user detail which has given vote, so it can't give again.
       UserVotes({form_id:req.body.form_id,
                  question_id:answer.question_id,
                  email:req.body.email
@@ -103,9 +107,11 @@ exports.answerTypeRangeUpdate=function(req,answer,data){
     }
   })
 }
+// when answer of check type
 exports.answerOfTypeCheckUpdate=function(req,answer,data)
 {
-  var set={};
+  var set={}; // new json object
+  // check value of checkbox type and update object
   if(answer.vote=="answer_one")
   {
     console.log("answer_one:",data[0].answer_two);
@@ -136,6 +142,7 @@ exports.answerOfTypeCheckUpdate=function(req,answer,data)
     };
   }
  console.log("set:",set);
+ //update user vote on answerofchecktype model
   AnswerOfCheckType.update({
     $and :[
       {form_id: req.body.form_id},
@@ -148,7 +155,8 @@ exports.answerOfTypeCheckUpdate=function(req,answer,data)
     if(!err&&data!=null)
     {
       console.log("success",data);
-      UserVotes({form_id:req.body.form_id,
+        // save user detail which has given vote, so it can't give again.
+       UserVotes({form_id:req.body.form_id,
                  question_id:answer.question_id,
                  email:req.body.email
 
