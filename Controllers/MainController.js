@@ -38,6 +38,19 @@ module.exports=function(app){
         }
       })
   });
+  //check user has submit aadhar
+  app.get('/api/aadhar-check/:email',function(req,res){
+    Aadhar.findOne({email:req.params.email}).exec(function(err,data){
+       console.log("hello",data);
+      if(!err&&data!=null)
+      {
+        res.send(true);
+      }
+      else {
+        res.send(false);
+      }
+    })
+  })
   //save user aadhar detail
   app.post('/api/aadhardetail',function(req,res){
    console.log("i am here.");
