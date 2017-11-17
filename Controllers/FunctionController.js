@@ -1,6 +1,8 @@
 var AnswerOfRangeType=require('../Models/answer-of-type-1');
 var AnswerOfCheckType=require('../Models/answer-of-type-2');
 var UserVotes=require('../Models/user-votes');
+var request=require('request');
+var Aadhar=require('../Models/aadhar_detail');
 //when answer of question range
 exports.answerTypeRangeUpdate=function(req,answer,data){
      var set={};   //new json object create
@@ -166,10 +168,49 @@ exports.answerOfTypeCheckUpdate=function(req,answer,data)
 
                 }
               })
-        
+
     }
     else {
       console.log(err);
     }
   })
+}
+//get user address from aadhar card image and save to collection
+exports.getAddress=function(response,err,req,res){
+  var result=JSON.parse(response.body);
+  console.log(result.ParsedResults);
+  if(!err&&result.ParsedResults!=null)
+  {
+    console.log("parsed result:",result.ParsedResults);
+    console.log("text:",result.ParsedResults[0].ParsedText);
+    var pincode=/[0-9][0-9][0-9][0-9][0-9][0-9]/i.exec(result.ParsedResults[0].ParsedText);
+     console.log("pincode",pincode[0]);
+    //extract user city and district using postalpincode api
+    request({
+      url:"http://postalpincode.in/api/pincode/"+pincode,
+      method:"GET"
+    },function(error,response,body){
+          if(!error)
+          {
+            var result=JSON.parse(body);
+            //res.json(result.PostOffice[0].Circle+result.PostOffice[0].Region);
+            //save aadhar detail
+            Aadhar({email:req.body.email,
+                    region:result.PostOffice[0].Region,
+                    address_code:pincode[0]}).save(function(err,data){
+                      if(!err)
+                      {
+                        console.log("data:",data);
+                        res.json(data);
+                      }
+                    });
+          }
+
+
+    })
+  }
+  else {
+    res.json(result.ErrorMessage);
+  }
+
 }

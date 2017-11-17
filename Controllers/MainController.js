@@ -2,6 +2,7 @@
 var bodyParser=require('body-parser');
 var mongo=require('mongoose');
 var request=require('request');
+var fs=require('file-system');
 //load controllers
 var FunctionController=require('./FunctionController');
 //load models
@@ -38,6 +39,32 @@ module.exports=function(app){
         }
       })
   });
+  //upload Aadhar image to server
+  app.post('/api/uploadImage',function(req,res){
+var image=req.body.image;
+    request({
+      headers: {
+        apikey: "db4d686b888957",
+        'Content-Type':"application/x-www-form-urlencoded"
+      },
+      url:"https://api.ocr.space/parse/image",
+      method:"POST",
+      formData:{
+        base64Image:image
+      }
+    },function(err,response){
+      if(!err)
+      {
+
+      FunctionController.getAddress(response,err,req,res);
+   }
+      else {
+          console.log("err:");
+         res.json(false);
+      }
+    })
+
+  })
   //check user has submit aadhar
   app.get('/api/aadhar-check/:email',function(req,res){
     Aadhar.findOne({email:req.params.email}).exec(function(err,data){

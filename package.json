@@ -11,9 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.1",
+    "file-system": "^2.2.2",
     "mongoose": "^4.11.14",
     "nodemon": "^1.12.1",
     "request": "^2.83.0",
-    "require": "^2.4.20"
+    "require": "^2.4.20",
+    "rn-camera-roll": "0.0.5"
   }
 }
