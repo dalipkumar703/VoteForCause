@@ -3,6 +3,16 @@ var bodyParser=require('body-parser');
 var mongo=require('mongoose');
 var request=require('request');
 var fs=require('file-system');
+var multer=require('multer');
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'upload/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+var upload=multer({storage:storage});
 //load controllers
 var FunctionController=require('./FunctionController');
 //load models
@@ -19,8 +29,10 @@ mongo.connect(db);
 //app start call function
 module.exports=function(app){
   console.log("main controller");
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
+
+  app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+
 //test url
   app.get('/',function(req,res){
     res.send("Bingo");
@@ -40,8 +52,9 @@ module.exports=function(app){
       })
   });
   //upload Aadhar image to server
-  app.post('/api/uploadImage',function(req,res){
-var image=req.body.image;
+  app.post('/api/uploadImage',upload.single('photo'),function(req,res){
+    console.log("request:",req);
+    //var image=req.body.image;
     request({
       headers: {
         apikey: "db4d686b888957",
@@ -50,16 +63,16 @@ var image=req.body.image;
       url:"https://api.ocr.space/parse/image",
       method:"POST",
       formData:{
-        base64Image:image
+        file:fs.createReadStream('upload/'+req.file.filename)
       }
     },function(err,response){
       if(!err)
       {
-
+         console.log("response,",response);
       FunctionController.getAddress(response,err,req,res);
    }
       else {
-          console.log("err:");
+          console.log("err:",err);
          res.json(false);
       }
     })
