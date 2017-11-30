@@ -37,6 +37,17 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
   app.get('/',function(req,res){
     res.send("Bingo");
   });
+  app.get('/api/getAadharDetail/:email',function(req,res){
+    Aadhar.findOne({email:req.params.email}).exec(function(err,data){
+      if(!err&&data!=null)
+      {
+        res.json(data);
+      }
+      else {
+        res.json(err);
+      }
+    })
+  })
 //register user
   app.post('/api/usersubmit/',function(req,res){
       User({
@@ -174,12 +185,13 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
           answer:[
           {
           type:range,
-          question_id: req.body.question_id
+          question_id: req.body.question_id,
+          vote:"axy"
         }
         ]
         }
           */
-          console.log("i am here.");
+          console.log("i am here.",req.body);
         //check aadhar detail exist
        Aadhar.findOne({
          $and : [
@@ -266,4 +278,28 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
          }
        })
   });
+
+app.get('/api/get-voting-result/:pincode',function(req,res){
+  AnswerOfRangeType.findOne({address_code:req.params.pincode}).exec(function(err,data){
+    if(!err&&data!=null)
+    {
+      AnswerOfCheckType.findOne({address_code:req.params.pincode}).exec(function(err,result){
+        if(!err&&result!=null)
+        {
+          var sendData={
+            check:result,
+            range:data
+          };
+          res.json(sendData);
+        }
+        else {
+          res.json("error in voting result");
+        }
+      })
+    }
+    else {
+      res.json(err);
+    }
+  })
+})
 }
